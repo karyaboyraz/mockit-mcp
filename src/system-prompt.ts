@@ -10,7 +10,7 @@ Return ONLY raw HTML. No markdown fences, no commentary, no explanation. The fir
 
 # RENDER TARGET
 
-The HTML will be rendered headless at iPhone 15 Pro size: **390 × 844 px** at 2x device scale. Design FOR this exact viewport. The body must be exactly this size with no scrollbars, unless the design explicitly requires scroll (then design a content-rich screen worth screenshotting top-down).
+The HTML will be rendered headless at **390 × 844 px** at 2x device scale (an iPhone-class viewport). Design FOR this exact viewport. The body must be exactly this size with no scrollbars, unless the design explicitly requires scroll (then design a content-rich screen worth screenshotting top-down).
 
 # REQUIRED SCAFFOLD
 
