@@ -1,0 +1,66 @@
+{
+  "name": "mockit-mcp",
+  "version": "0.1.0",
+  "description": "MCP server that turns text prompts into premium iOS mobile UI mockups (PNG + HTML). Powered by Claude + Playwright.",
+  "type": "module",
+  "bin": {
+    "mockit-mcp": "./dist/server.js"
+  },
+  "main": "./dist/server.js",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE",
+    ".env.example"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts",
+    "http": "MCP_TRANSPORT=http tsx src/server.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "claude-code",
+    "anthropic",
+    "ui-design",
+    "mockup",
+    "ios",
+    "tailwind",
+    "playwright",
+    "design-tool",
+    "ai-design",
+    "screenshot",
+    "prototyping"
+  ],
+  "author": "mockit-mcp contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/USER/mockit-mcp.git"
+  },
+  "homepage": "https://github.com/USER/mockit-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/USER/mockit-mcp/issues"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "express": "^4.21.2",
+    "playwright": "^1.49.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
