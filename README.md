@@ -7,10 +7,17 @@
   <p>An MCP server that pairs Claude (Opus 4.7 by default) with a Playwright renderer to generate <em>screenshot-grade</em> mobile app designs from natural language.</p>
 
   <p>
-    <a href="#install"><img src="https://img.shields.io/badge/install-quick%20start-0A84FF?style=for-the-badge" alt="Install"/></a>
+    <a href="https://github.com/karyaboyraz/mockit-mcp/releases/latest"><img src="https://img.shields.io/github/v/release/karyaboyraz/mockit-mcp?style=for-the-badge&color=BF5AF2&label=release" alt="Latest release"/></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-34C759?style=for-the-badge" alt="MIT License"/></a>
-    <img src="https://img.shields.io/badge/Node.js-%E2%89%A520-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js 20+"/>
-    <img src="https://img.shields.io/badge/MCP-1.0-BF5AF2?style=for-the-badge" alt="MCP 1.0"/>
+    <a href="https://github.com/karyaboyraz/mockit-mcp/stargazers"><img src="https://img.shields.io/github/stars/karyaboyraz/mockit-mcp?style=for-the-badge&color=FFD60A&logo=github&logoColor=white" alt="GitHub stars"/></a>
+    <a href="https://github.com/karyaboyraz/mockit-mcp/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/karyaboyraz/mockit-mcp/ci.yml?style=for-the-badge&label=ci" alt="CI status"/></a>
+  </p>
+  <p>
+    <img src="https://img.shields.io/badge/Node.js-%E2%89%A520-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js 20+"/>
+    <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript strict"/>
+    <img src="https://img.shields.io/badge/MCP-1.0-BF5AF2?style=flat-square" alt="MCP 1.0"/>
+    <img src="https://img.shields.io/badge/Claude-Opus%204.7-D97757?style=flat-square" alt="Claude Opus 4.7"/>
+    <img src="https://img.shields.io/badge/Playwright-headless-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright"/>
   </p>
 </div>
 
