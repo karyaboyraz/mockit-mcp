@@ -201,6 +201,21 @@ designs/
     └── {name-slug}-{id8}.json   # full UUID, prompt, parent ID, tokens, model, cost
 ```
 
+## Documentation
+
+Reference and guides live in [`docs/`](docs/README.md):
+
+| Topic | Page |
+|-------|------|
+| Install, first generation, verify | [Getting Started](docs/getting-started.md) |
+| Every env var, defaults, what they do | [Configuration](docs/configuration.md) |
+| The four MCP tools — schemas, examples | [Tools Reference](docs/tools.md) |
+| Pipeline end-to-end | [Architecture](docs/architecture.md) |
+| Local, Docker, networked deployments | [Deployment](docs/deployment.md) |
+| Sandbox, network allowlist, HTTP auth | [Security](docs/security.md) |
+| How the design voice is encoded | [System Prompt](docs/system-prompt.md) |
+| Common errors and how to fix them | [Troubleshooting](docs/troubleshooting.md) |
+
 ## Tuning the design voice
 
 The hand-tuned system prompt lives in [`src/system-prompt.ts`](src/system-prompt.ts). It's where the iOS HIG enforcement, the no-stock-photo rule, the SF Pro fallback chain, and the editorial typography preferences are encoded. Want Material You instead, or a desktop dashboard voice? Edit it.
