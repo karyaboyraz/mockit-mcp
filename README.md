@@ -65,7 +65,7 @@ It's not a static template engine and it's not generic AI slop. The system promp
 ### Quick start (CLI backend, recommended for local dev)
 
 ```bash
-git clone https://github.com/USER/mockit-mcp.git
+git clone https://github.com/karyaboyraz/mockit-mcp.git
 cd mockit-mcp
 npm install
 npx playwright install chromium

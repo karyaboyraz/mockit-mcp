@@ -41,11 +41,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/USER/mockit-mcp.git"
+    "url": "git+https://github.com/karyaboyraz/mockit-mcp.git"
   },
-  "homepage": "https://github.com/USER/mockit-mcp#readme",
+  "homepage": "https://github.com/karyaboyraz/mockit-mcp#readme",
   "bugs": {
-    "url": "https://github.com/USER/mockit-mcp/issues"
+    "url": "https://github.com/karyaboyraz/mockit-mcp/issues"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
