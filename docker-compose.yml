@@ -4,14 +4,18 @@ services:
     image: mockit-mcp:latest
     container_name: mockit-mcp
     restart: unless-stopped
+    # Bind to loopback by default. To expose remotely, change to "0.0.0.0:7821:7821"
+    # AND set MCP_HTTP_TOKEN to a strong secret (otherwise the server refuses non-loopback requests).
     ports:
-      - "7821:7821"
+      - "127.0.0.1:7821:7821"
     environment:
       CLAUDE_BACKEND: ${CLAUDE_BACKEND:-api}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-opus-4-7}
       MCP_TRANSPORT: http
       HTTP_PORT: "7821"
+      HTTP_HOST: "0.0.0.0"
+      MCP_HTTP_TOKEN: ${MCP_HTTP_TOKEN:-}
       DESIGNS_DIR: /data/designs
       VIEWPORT_WIDTH: "390"
       VIEWPORT_HEIGHT: "844"
@@ -19,7 +23,7 @@ services:
     volumes:
       - ./designs:/data/designs
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:7821/health"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:7821/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3

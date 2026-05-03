@@ -14,23 +14,18 @@ export async function generateScreenViaApi(input: GenerateInput): Promise<Genera
   }
   const userPrompt = buildUserPrompt(input);
 
-  const response = await client.messages.create(
-    {
-      model: MODEL,
-      max_tokens: 16000,
-      system: [
-        {
-          type: "text",
-          text: SYSTEM_PROMPT,
-          cache_control: { type: "ephemeral" },
-        } as unknown as { type: "text"; text: string },
-      ],
-      messages: [{ role: "user", content: userPrompt }],
-    },
-    {
-      headers: { "anthropic-beta": "prompt-caching-2024-07-31" },
-    }
-  );
+  const response = await client.messages.create({
+    model: MODEL,
+    max_tokens: 16000,
+    system: [
+      {
+        type: "text",
+        text: SYSTEM_PROMPT,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
+    messages: [{ role: "user", content: userPrompt }],
+  });
 
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") {
@@ -38,16 +33,12 @@ export async function generateScreenViaApi(input: GenerateInput): Promise<Genera
   }
 
   const html = extractHtml(textBlock.text);
-  const usage = response.usage as Anthropic.Usage & {
-    cache_read_input_tokens?: number;
-    cache_creation_input_tokens?: number;
-  };
 
   return {
     html,
-    inputTokens: usage.input_tokens,
-    outputTokens: usage.output_tokens,
-    cacheReadTokens: usage.cache_read_input_tokens ?? 0,
+    inputTokens: response.usage.input_tokens,
+    outputTokens: response.usage.output_tokens,
+    cacheReadTokens: response.usage.cache_read_input_tokens ?? 0,
     model: response.model,
   };
 }

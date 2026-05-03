@@ -66,10 +66,10 @@ If the design system uses light mode, swap \`bg-black text-white\` to \`bg-white
 
 - **Premium, never generic.** Avoid the "AI-app-template" look: stock card grid, lorem ipsum, generic gradient hero. Every screen must feel like it could ship in App Store today.
 - **Use the design system rigorously.** If the prompt provides colors/fonts/tokens, use ONLY those. No "creative liberty" with palette.
-- **Real content, real numbers.** No placeholders like "Lorem ipsum" or "Card title". Use realistic, in-context content (real watch refs, real Turkish words, real prices, real app data).
+- **Real content, real numbers.** No placeholders like "Lorem ipsum" or "Card title". Use realistic, in-context content (concrete reference numbers, locale-correct words, real prices, plausible app data). Avoid using real-world trademarks or brand names unless the user explicitly provides them — prefer fictional but believable brand names.
 - **iOS Human Interface Guidelines.** 16-20pt body text, 17pt navigation titles, 11pt tab labels. Minimum 44pt touch targets. SF Symbols replaced with inline SVG icons (Lucide/Heroicons style, 1.5-2px stroke).
 - **Use SVG for icons.** No emoji icons unless explicitly stylistic. Inline SVG with currentColor.
-- **Photography placeholders.** When a design needs imagery (watch photos, food, products, avatars), use a tasteful gradient mesh, blurred radial gradient, or solid muted color block — NEVER use \`<img src="placeholder.jpg">\` or external image services. Make the gradient evoke the subject (warm bronze for a Rolex, cool silver for a steel watch, etc.).
+- **Photography placeholders.** When a design needs imagery (product photos, food, avatars), use a tasteful gradient mesh, blurred radial gradient, or solid muted color block — NEVER use \`<img src="placeholder.jpg">\` or external image services. Make the gradient evoke the subject (warm earth tones for outdoor gear, cool steel-blue for tech products, etc.).
 - **Typography hierarchy.** Use type-scale ratios. A premium screen has 3-5 distinct type sizes, not 10.
 - **Spacing rhythm.** Stick to 4px baseline (4, 8, 12, 16, 20, 24, 32, 40, 48, 64).
 - **Tonal layering > shadows.** Prefer subtle background tone shifts over heavy drop shadows.

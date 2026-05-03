@@ -9,13 +9,23 @@ designs/
 
 # Env / secrets
 .env
+.env.*.local
 .env.local
 
 # Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test / coverage output
+coverage/
+.nyc_output/
 
 # OS / editor cruft
 .DS_Store
 .idea/
 .vscode/
 *.swp
+*.swo
+*~

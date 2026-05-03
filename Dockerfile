@@ -1,28 +1,31 @@
-FROM mcr.microsoft.com/playwright:v1.49.1-jammy
+FROM mcr.microsoft.com/playwright:v1.59.1-jammy
 
 WORKDIR /app
 
-# Cache deps layer
-COPY package.json ./
-RUN npm install --omit=dev && npm install --no-save typescript tsx
+# Reproducible deps layer: copy lockfile + manifest, then `npm ci`
+COPY package.json package-lock.json ./
+RUN npm ci
 
+# Build
 COPY tsconfig.json ./
 COPY src ./src
-
 RUN npx tsc
 
-# Strip dev deps after build
+# Drop dev deps for the runtime layer
 RUN npm prune --omit=dev
 
 ENV NODE_ENV=production \
     MCP_TRANSPORT=http \
     HTTP_PORT=7821 \
-    DESIGNS_DIR=/data/designs
+    HTTP_HOST=0.0.0.0 \
+    DESIGNS_DIR=/data/designs \
+    MOCKIT_IN_CONTAINER=1
 
 EXPOSE 7821
 VOLUME ["/data"]
 
+# Use node's built-in fetch for healthcheck (no wget dependency)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
-  CMD wget -qO- http://localhost:7821/health || exit 1
+  CMD node -e "fetch('http://127.0.0.1:7821/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 CMD ["node", "dist/server.js"]

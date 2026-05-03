@@ -3,13 +3,33 @@ import { chromium, Browser, BrowserContext } from "playwright";
 const VIEWPORT_WIDTH = parseInt(process.env.VIEWPORT_WIDTH ?? "390", 10);
 const VIEWPORT_HEIGHT = parseInt(process.env.VIEWPORT_HEIGHT ?? "844", 10);
 const DEVICE_SCALE = parseFloat(process.env.DEVICE_SCALE ?? "2");
+const NO_SANDBOX = (process.env.PLAYWRIGHT_NO_SANDBOX ?? "auto").toLowerCase();
 
 let browserPromise: Promise<Browser> | null = null;
 
+function shouldDisableSandbox(): boolean {
+  if (NO_SANDBOX === "true" || NO_SANDBOX === "1") return true;
+  if (NO_SANDBOX === "false" || NO_SANDBOX === "0") return false;
+  // 'auto' → only disable inside containers (Docker/Kubernetes/CI), where the
+  // setuid sandbox is unavailable. Outside containers we keep Chromium's
+  // default sandbox to limit blast radius if model output contains malicious HTML.
+  if (process.env.MOCKIT_IN_CONTAINER === "1") return true;
+  if (process.env.GITHUB_ACTIONS === "true") return true;
+  return false;
+}
+
 function getBrowser(): Promise<Browser> {
   if (!browserPromise) {
-    browserPromise = chromium.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    const args: string[] = [];
+    if (shouldDisableSandbox()) {
+      args.push("--no-sandbox", "--disable-setuid-sandbox");
+    }
+    browserPromise = chromium.launch({ args }).catch((err: Error) => {
+      browserPromise = null;
+      const hint = err.message.includes("Executable doesn't exist")
+        ? "\n→ Run: npx playwright install chromium"
+        : "";
+      throw new Error(`Failed to launch Chromium: ${err.message}${hint}`);
     });
   }
   return browserPromise;
@@ -17,8 +37,8 @@ function getBrowser(): Promise<Browser> {
 
 export async function shutdownRenderer(): Promise<void> {
   if (browserPromise) {
-    const b = await browserPromise;
-    await b.close();
+    const b = await browserPromise.catch(() => null);
+    if (b) await b.close();
     browserPromise = null;
   }
 }

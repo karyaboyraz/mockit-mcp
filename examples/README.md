@@ -2,17 +2,21 @@
 
 Real outputs from `mockit-mcp`. All generated from a single prompt — no manual editing — using the default system prompt and the `cli` backend (Claude Opus 4.7).
 
-## Watch collection app
+## Fitness dashboard
 
-<img src="screens/watchvault.png" width="320" alt="Watch collection app screen"/>
+<img src="screens/fitness.png" width="320" alt="Fitness tracker dashboard"/>
 
 **Prompt** *(abridged)*:
 
-> Luxury watch collection manager app. Editorial luxury magazine aesthetic, Hodinkee-inspired. Photography-first, dark mode with muted gold (#C9A961) accent, Playfair Display + Inter + Space Grotesk type stack.
+> A premium fitness tracker dashboard. Modern editorial dark mode. Top "Today" headline with a date-picker chevron, profile circle. Hero card with three concentric SVG activity rings (energy / exercise / stand) at 220pt with a subtle glow filter. Center of the rings shows "8.4 km" with a small "TODAY" label above. Below the rings, three stat columns with vertical dividers: 324 kcal (energy), 42min (exercise), 9/12 stand hours.
 >
-> Layout: Top wordmark, summary card (12 watches / $284,500 / +8.2% YTD), filter chips, FEATURED section with a hero card showing a Submariner Date dial as SVG (concentric bezel rings, lume dot, hour markers, ROLEX SUBMARINER text), then a 2-column COLLECTION grid of 4 watches (GMT Master II, Royal Oak 15500ST, Speedmaster Professional, Nautilus 5711) with gradient placeholders evoking each watch. Floating "+ Add Watch" pill, bottom tab bar.
+> WEEK section with a Day/Week/Month segmented pill (Week selected). 7-bar weekly chart with today highlighted in neon green; "Daily avg 7.2 km · +12% vs last week" below.
+>
+> RECENT WORKOUTS list — three cards: Morning Run (6.2 km · 32 min · 412 kcal), Strength Training (Push day · 48 min · 285 kcal), Yoga Flow (25 min · 95 kcal). Each card has a custom SVG icon in a tinted circle.
+>
+> Bottom tab bar: Today, Workouts, Goals, Profile.
 
-Notable: the Submariner dial is drawn as an inline SVG — concentric bezel, lume pip at 12, GMT-style hands, date window. No external assets.
+Notable: each ring uses a stroke-dasharray + filter glow for the soft halo. All icons are inline SVGs (no emoji, no external sprite). Numbers are tabular-aligned in Space Grotesk so the bar chart and stat columns line up perfectly.
 
 ## Volume / cubage calculator (Turkish)
 
@@ -22,7 +26,7 @@ Notable: the Submariner dial is drawn as an inline SVG — concentric bezel, lum
 
 > Türkçe hacim/kübaj hesaplama uygulaması. Industrial precision aesthetic, light mode (warm off-white #F8F7F4), construction safety orange #FF6B1A accent. Plus Jakarta Sans + Space Grotesk.
 >
-> Layout: Wordmark + history icon, ŞEKİL SEÇ section with an "AR ile Tara" pill (dashed gold border) and 5 horizontally-scrollable shape cards (Küp/Kutu selected with orange border + tint, Silindir, Koni, Havuz, Düzensiz with AI badge). ÖLÇÜLER section with cm/M/inch toggle and three input cards (Uzunluk 4.50, Genişlik 3.20, Yükseklik 2.80). HACİM result card on a soft orange gradient: "40.32 m³" in Space Grotesk 64pt, with "≈ 40,320 litre · 8 standart bidon" below. MALZEME TAHMİNİ rows (Beton C25 96.8 ton, Kum 64.5 ton, Su 40,320 L), big "PDF Teklif Oluştur" CTA, and a Pro hint.
+> Layout: Wordmark + history icon, ŞEKİL SEÇ section with an "AR ile Tara" pill (dashed gold border) and 5 horizontally-scrollable shape cards (Küp/Kutu selected with orange border + tint, Silindir, Koni, Havuz, Düzensiz with AI badge). ÖLÇÜLER section with cm/M/inch toggle and three input cards (Uzunluk 4.50, Genişlik 3.20, Yükseklik 2.80). HACİM result card on a soft orange gradient: "40.32 m³" in Space Grotesk 64pt, with "≈ 40,320 litre · 8 standart bidon" below. MALZEME TAHMİNİ rows (concrete, sand, water with quantities), big "PDF Teklif Oluştur" CTA, and a Pro hint.
 
 Notable: full Turkish localization including idiomatic terms (ölçüler, hacim, malzeme, teklif, sahada-anlaşılır references like *standart bidon*).
 
@@ -30,13 +34,14 @@ Notable: full Turkish localization including idiomatic terms (ölçüler, hacim,
 
 A few habits that produce consistently good results:
 
-- **Lead with the app's purpose and audience.** "Luxury watch collection for serious collectors" beats "watch app".
+- **Lead with the app's purpose and audience.** "Fitness tracker for runners who care about heart-rate zones" beats "fitness app".
 - **Pick a vibe.** Editorial / Industrial / Playful / Brutalist / Minimal / Tactile. The system prompt already enforces premium iOS aesthetics, but a vibe nudges flavor.
 - **Specify the type system explicitly** if you want non-default fonts. The system prompt includes Inter, Space Grotesk, Playfair Display, and Plus Jakarta Sans by default.
 - **Describe the layout top-to-bottom**, listing each section's purpose and content. The model maps these to real Tailwind layouts.
-- **Use real numbers and copy.** "$14,200" beats "{price}". "126610LN" beats "{ref}".
+- **Use real numbers and copy.** "$14,200" beats "{price}". "6.2 km · 32 min · 412 kcal" beats "{distance} {duration} {calories}".
 - **For non-English UIs, write the labels in the target language** — the model handles diacritics correctly when you do (e.g., *Ölçüler*, *Yükseklik*).
-- **Skip stock-photo placeholders.** The system prompt already replaces images with tasteful gradient meshes; just describe the subject ("a deep navy bezel evoking a dive watch").
+- **Skip stock-photo placeholders.** The system prompt already replaces images with tasteful gradient meshes; just describe the subject ("a deep navy gradient evoking a calm running trail at dawn").
+- **Avoid real-world brand names.** The system prompt steers away from trademarked product names — say "a luxury sports watch" rather than naming a specific brand.
 
 ## Re-running these locally
 
@@ -47,6 +52,6 @@ claude mcp add mockit -- node "$(pwd)/dist/server.js"
 
 Then in Claude Code:
 
-> *Use generate_screen to make a luxury watch collection app — premium dark, gold accents, hero Submariner card, 4-watch grid.*
+> *Use generate_screen to make a fitness tracker dashboard with three activity rings, a weekly bar chart, and a recent workouts list.*
 
 Adjust prompts, then `iterate_screen` for refinements.

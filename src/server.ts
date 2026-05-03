@@ -8,6 +8,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import express from "express";
 import { z } from "zod";
+import { timingSafeEqual } from "node:crypto";
 
 import { generateScreen, activeBackend } from "./claude.js";
 import { renderHtml, shutdownRenderer } from "./renderer.js";
@@ -299,8 +300,36 @@ async function main() {
     process.stderr.write("[mockit-mcp] stdio transport ready\n");
   } else if (transport === "http") {
     const port = parseInt(process.env.HTTP_PORT ?? "7821", 10);
+    const host = process.env.HTTP_HOST ?? "127.0.0.1";
+    const authToken = process.env.MCP_HTTP_TOKEN;
+    const isLoopbackBind = host === "127.0.0.1" || host === "::1" || host === "localhost";
+
+    if (!isLoopbackBind && !authToken) {
+      console.error(
+        `Refusing to start: HTTP_HOST="${host}" binds to a non-loopback interface but MCP_HTTP_TOKEN is not set.\n` +
+          "Set MCP_HTTP_TOKEN to a strong secret, or bind to 127.0.0.1 only."
+      );
+      process.exit(1);
+    }
+
     const app = express();
     app.use(express.json({ limit: "10mb" }));
+
+    // Bearer-token auth when configured. /health is always public.
+    if (authToken) {
+      const expected = Buffer.from(`Bearer ${authToken}`);
+      app.use((req, res, next) => {
+        if (req.path === "/health") return next();
+        const header = req.header("authorization") ?? "";
+        const got = Buffer.from(header);
+        const ok = got.length === expected.length && timingSafeEqual(got, expected);
+        if (!ok) {
+          res.status(401).json({ error: "unauthorized" });
+          return;
+        }
+        next();
+      });
+    }
 
     const httpTransport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined, // stateless
@@ -312,8 +341,11 @@ async function main() {
     });
     app.get("/health", (_req, res) => res.json({ ok: true, transport: "http" }));
 
-    app.listen(port, () => {
-      process.stderr.write(`[mockit-mcp] http transport ready on :${port}/mcp\n`);
+    app.listen(port, host, () => {
+      const mode = authToken ? "bearer-auth" : "loopback-only";
+      process.stderr.write(
+        `[mockit-mcp] http transport ready on http://${host}:${port}/mcp  (${mode})\n`
+      );
     });
   } else {
     console.error(`Unknown MCP_TRANSPORT: ${transport}`);

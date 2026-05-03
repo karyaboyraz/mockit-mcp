@@ -20,7 +20,7 @@
 
 Ask Claude Code (or any MCP client):
 
-> *Design the main screen for a luxury watch collection app. Premium dark mode, gold accents, hero card with a Submariner photo, 2-column grid of 4 watches, bottom tab bar.*
+> *Design the home dashboard for a fitness tracker. Three concentric activity rings, weekly bar chart, recent workouts list, premium dark mode with neon accents.*
 
 `mockit-mcp` returns a real PNG mockup (sized 390×844 @2x for iPhone 15 Pro) **and** the underlying HTML/Tailwind source — so you can iterate visually and port to SwiftUI when you're ready to build.
 
@@ -29,8 +29,8 @@ It's not a static template engine and it's not generic AI slop. The system promp
 <div align="center">
   <table>
     <tr>
-      <td align="center"><img src="examples/screens/watchvault.png" width="280" alt="Watch collection app"/><br/><sub><b>Watch collection</b></sub></td>
-      <td align="center"><img src="examples/screens/volumetrik.png" width="280" alt="Volume calculator app"/><br/><sub><b>Volume calculator</b></sub></td>
+      <td align="center"><img src="examples/screens/fitness.png" width="280" alt="Fitness tracker dashboard"/><br/><sub><b>Fitness dashboard</b></sub></td>
+      <td align="center"><img src="examples/screens/volumetrik.png" width="280" alt="Volume calculator app screen (Turkish)"/><br/><sub><b>Volume calculator</b> (Turkish)</sub></td>
     </tr>
   </table>
   <p><sub>Generated from a single prompt each. See <a href="examples/">examples/</a>.</sub></p>
@@ -39,7 +39,7 @@ It's not a static template engine and it's not generic AI slop. The system promp
 ## Highlights
 
 - **Two backends, same tools.** Use the local `claude` CLI (subscription, $0 extra) or the Anthropic API (key + per-call pricing). Switch with one env var.
-- **Real PNG output.** Headless Chromium via Playwright. Configurable viewport — iPhone, iPad, Apple Watch, custom.
+- **Real PNG output.** Headless Chromium via Playwright. Default viewport is iPhone 15 Pro (390×844 @2x); any custom size is one env var away.
 - **Iterative refinement.** `iterate_screen` takes a screen ID + feedback ("make the hero card smaller") and produces a new version, tracking parent/child.
 - **Disk-backed library.** Every generation saves HTML + PNG + JSON metadata. Browse, filter, re-export.
 - **MCP standard.** Works with Claude Code, Claude Desktop, Cursor, Windsurf, or any MCP client.
@@ -92,16 +92,25 @@ claude mcp add mockit -- node "$(pwd)/dist/server.js"
 ### Docker (HTTP transport, for shared deployment)
 
 ```bash
-echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
-echo "CLAUDE_BACKEND=api" >> .env
+cat > .env <<'ENV'
+CLAUDE_BACKEND=api
+ANTHROPIC_API_KEY=sk-ant-...
+# Required if you change the port binding from 127.0.0.1 to 0.0.0.0:
+MCP_HTTP_TOKEN=$(openssl rand -hex 32)
+ENV
 docker compose up -d --build
 ```
 
-Then point any client at `http://<host>:7821/mcp`:
+By default `docker-compose.yml` binds the HTTP port to `127.0.0.1` only and the server requires `MCP_HTTP_TOKEN` for any non-loopback request. **Don't expose this server to a public network without setting a strong `MCP_HTTP_TOKEN`** — every generation hits your Anthropic API key.
+
+Then point any client at the loopback URL:
 
 ```bash
-claude mcp add --transport http mockit http://<host>:7821/mcp
+claude mcp add --transport http mockit http://127.0.0.1:7821/mcp \
+  -H "Authorization: Bearer <MCP_HTTP_TOKEN>"
 ```
+
+For remote access, change `docker-compose.yml`'s port binding to `0.0.0.0:7821:7821` and ensure `MCP_HTTP_TOKEN` is set — the server refuses to start otherwise.
 
 ## Usage
 
@@ -125,11 +134,13 @@ All optional. See [`.env.example`](.env.example) for the full list.
 |-----|---------|-------|
 | `CLAUDE_BACKEND` | `cli` | `cli` uses the `claude` CLI; `api` uses Anthropic SDK directly |
 | `ANTHROPIC_API_KEY` | — | Required only for `api` backend |
-| `ANTHROPIC_MODEL` | `claude-opus-4-7` | API backend only |
+| `ANTHROPIC_MODEL` | `claude-opus-4-7` | API backend only. If your account doesn't have Opus access, set to `claude-sonnet-4-6` or `claude-haiku-4-5` |
 | `CLAUDE_CLI_PATH` | `claude` | Path to the `claude` binary |
 | `CLAUDE_CLI_TIMEOUT_MS` | `180000` | Subprocess timeout |
 | `MCP_TRANSPORT` | `stdio` | `stdio` or `http` |
 | `HTTP_PORT` | `7821` | HTTP transport port |
+| `HTTP_HOST` | `127.0.0.1` | Bind interface; non-loopback requires `MCP_HTTP_TOKEN` |
+| `MCP_HTTP_TOKEN` | — | Bearer token for HTTP auth. Required if `HTTP_HOST` is non-loopback |
 | `DESIGNS_DIR` | `./designs` | Where outputs are persisted |
 | `VIEWPORT_WIDTH` | `390` | Render width (iPhone 15 Pro) |
 | `VIEWPORT_HEIGHT` | `844` | Render height |
@@ -142,7 +153,7 @@ Per generation: ~3K input tokens (system prompt) + ~6-12K output tokens dependin
 | Backend | First call | Cached follow-up |
 |---------|-----------|------------------|
 | `cli`   | counts against your Claude Code subscription quota | same, but cache hits cost ~80% less |
-| `api`   | ~$0.30 (Opus 4.7) | ~$0.05 |
+| `api`   | ~$0.50–0.90 (Opus 4.7, depends on output length) | ~$0.10–0.20 |
 
 System-prompt caching is on by default (5-minute TTL).
 
@@ -218,3 +229,7 @@ Built on top of:
 - [Model Context Protocol](https://modelcontextprotocol.io/) — the integration standard
 - [Playwright](https://playwright.dev/) — the renderer
 - [Tailwind CSS](https://tailwindcss.com/) — via CDN, in every generated screen
+
+## Trademarks
+
+iPhone, iPad, Apple Watch, and iOS are trademarks of Apple Inc. Claude is a trademark of Anthropic, PBC. mockit-mcp is an independent open-source project and is not affiliated with, endorsed by, or sponsored by Apple Inc. or Anthropic, PBC. All other product names, logos, and brands are property of their respective owners.
