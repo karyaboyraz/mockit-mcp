@@ -64,6 +64,28 @@ export async function renderHtml(html: string, opts?: { fullPage?: boolean }): P
 
   try {
     const page = await context.newPage();
+
+    // Restrict network access to the assets the system prompt actually allows
+    // (Tailwind CDN, Google Fonts). Anything else the model produces — tracking
+    // pixels, third-party scripts, exfil endpoints — is blocked.
+    await page.route("**/*", (route) => {
+      const url = route.request().url();
+      if (url.startsWith("data:")) return route.continue();
+      try {
+        const host = new URL(url).hostname;
+        if (
+          host === "cdn.tailwindcss.com" ||
+          host === "fonts.googleapis.com" ||
+          host === "fonts.gstatic.com"
+        ) {
+          return route.continue();
+        }
+      } catch {
+        /* fallthrough to abort */
+      }
+      return route.abort();
+    });
+
     await page.setContent(html, { waitUntil: "networkidle", timeout: 30000 });
 
     // Tailwind CDN compiles classes via JS; wait one tick for JIT.

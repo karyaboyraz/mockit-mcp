@@ -24,6 +24,11 @@ ENV NODE_ENV=production \
 EXPOSE 7821
 VOLUME ["/data"]
 
+# Make the data dir writable by the non-root user that ships with the
+# Playwright base image.
+RUN mkdir -p /data/designs && chown -R pwuser:pwuser /data /app
+USER pwuser
+
 # Use node's built-in fetch for healthcheck (no wget dependency)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
   CMD node -e "fetch('http://127.0.0.1:7821/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"

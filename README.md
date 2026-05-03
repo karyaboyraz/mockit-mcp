@@ -22,7 +22,7 @@ Ask Claude Code (or any MCP client):
 
 > *Design the home dashboard for a fitness tracker. Three concentric activity rings, weekly bar chart, recent workouts list, premium dark mode with neon accents.*
 
-`mockit-mcp` returns a real PNG mockup (sized 390×844 @2x for iPhone 15 Pro) **and** the underlying HTML/Tailwind source — so you can iterate visually and port to SwiftUI when you're ready to build.
+`mockit-mcp` returns a real PNG mockup (sized 390×844 at 2x device scale, an iPhone-class viewport) **and** the underlying HTML/Tailwind source — so you can iterate visually and port to SwiftUI when you're ready to build.
 
 It's not a static template engine and it's not generic AI slop. The system prompt is hand-tuned for premium iOS aesthetics: real content, SVG icons (no emoji), tasteful gradients in place of stock photos, iOS HIG type scale, and tonal layering instead of heavy shadows.
 
@@ -39,7 +39,7 @@ It's not a static template engine and it's not generic AI slop. The system promp
 ## Highlights
 
 - **Two backends, same tools.** Use the local `claude` CLI (subscription, $0 extra) or the Anthropic API (key + per-call pricing). Switch with one env var.
-- **Real PNG output.** Headless Chromium via Playwright. Default viewport is iPhone 15 Pro (390×844 @2x); any custom size is one env var away.
+- **Real PNG output.** Headless Chromium via Playwright. Default viewport is **390×844 @2x** (iPhone-class); any custom size is one env var away.
 - **Iterative refinement.** `iterate_screen` takes a screen ID + feedback ("make the hero card smaller") and produces a new version, tracking parent/child.
 - **Disk-backed library.** Every generation saves HTML + PNG + JSON metadata. Browse, filter, re-export.
 - **MCP standard.** Works with Claude Code, Claude Desktop, Cursor, Windsurf, or any MCP client.
@@ -142,20 +142,21 @@ All optional. See [`.env.example`](.env.example) for the full list.
 | `HTTP_HOST` | `127.0.0.1` | Bind interface; non-loopback requires `MCP_HTTP_TOKEN` |
 | `MCP_HTTP_TOKEN` | — | Bearer token for HTTP auth. Required if `HTTP_HOST` is non-loopback |
 | `DESIGNS_DIR` | `./designs` | Where outputs are persisted |
-| `VIEWPORT_WIDTH` | `390` | Render width (iPhone 15 Pro) |
-| `VIEWPORT_HEIGHT` | `844` | Render height |
-| `DEVICE_SCALE` | `2` | Retina factor |
+| `VIEWPORT_WIDTH` | `390` | Render width in CSS pixels |
+| `VIEWPORT_HEIGHT` | `844` | Render height in CSS pixels |
+| `DEVICE_SCALE` | `2` | Retina factor (final PNG is `WIDTH × DEVICE_SCALE` wide) |
+| `PLAYWRIGHT_NO_SANDBOX` | `auto` | `auto` = sandbox enabled outside containers; `true` to force-disable, `false` to force-enable. Disabling reduces isolation against malicious model HTML — only do so inside a container. |
 
 ## Cost
 
-Per generation: ~3K input tokens (system prompt) + ~6-12K output tokens depending on screen complexity.
+Per generation: ~3K input tokens (system prompt) + ~6–12K output tokens depending on screen complexity. Output dominates the cost on Opus.
 
 | Backend | First call | Cached follow-up |
 |---------|-----------|------------------|
-| `cli`   | counts against your Claude Code subscription quota | same, but cache hits cost ~80% less |
-| `api`   | ~$0.50–0.90 (Opus 4.7, depends on output length) | ~$0.10–0.20 |
+| `cli`   | counts against your Claude Code subscription quota | same — cache only discounts the system prompt |
+| `api`   | ~$0.50–0.95 (Opus 4.7) | ~$0.45–0.90 (cache discounts the system-prompt input only; output cost is unchanged) |
 
-System-prompt caching is on by default (5-minute TTL).
+System-prompt caching is on by default (5-minute TTL). It saves a few cents per call but is **not** an order-of-magnitude discount — output tokens still bill at full rate. For real cost reduction, switch to a smaller model (`claude-sonnet-4-6` or `claude-haiku-4-5`).
 
 ## Architecture
 
@@ -188,9 +189,9 @@ System-prompt caching is on by default (5-minute TTL).
 ```
 designs/
 └── {project-slug}/
-    ├── {name-slug}-{id}.html
-    ├── {name-slug}-{id}.png
-    └── {name-slug}-{id}.json   # prompt, parent ID, tokens, model, cost
+    ├── {name-slug}-{id8}.html   # id8 = first 8 chars of the screen UUID
+    ├── {name-slug}-{id8}.png
+    └── {name-slug}-{id8}.json   # full UUID, prompt, parent ID, tokens, model, cost
 ```
 
 ## Tuning the design voice

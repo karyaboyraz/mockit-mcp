@@ -100,7 +100,11 @@ function runCli(args: string[], stdinText: string): Promise<string> {
       }
       if (code !== 0) {
         return reject(
-          new Error(`Claude CLI exited with code ${code}\nstderr: ${stderr.slice(0, 2000)}`)
+          new Error(
+            `Claude CLI exited with code ${code}. ` +
+              `Make sure the CLI is logged in (run \`claude\` interactively once). ` +
+              `Detail: ${redactStderr(stderr)}`
+          )
         );
       }
       resolve(stdout);
@@ -109,6 +113,19 @@ function runCli(args: string[], stdinText: string): Promise<string> {
     child.stdin.write(stdinText);
     child.stdin.end();
   });
+}
+
+/**
+ * Strip absolute filesystem paths from CLI stderr so we never echo a user's
+ * home directory or config path through MCP tool responses.
+ */
+function redactStderr(stderr: string): string {
+  const trimmed = stderr.slice(0, 600).trim();
+  if (!trimmed) return "(no stderr)";
+  return trimmed
+    .replace(/\/Users\/[^/\s"]+/g, "/Users/<redacted>")
+    .replace(/\/home\/[^/\s"]+/g, "/home/<redacted>")
+    .replace(/[A-Z]:\\Users\\[^\\\s"]+/g, "C:\\Users\\<redacted>");
 }
 
 function extractHtml(raw: string): string {

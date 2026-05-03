@@ -39,7 +39,7 @@ const listInput = z.object({
 });
 
 const getInput = z.object({
-  screen_id: z.string(),
+  screen_id: z.string().describe("Screen UUID returned by generate_screen or iterate_screen."),
   include_html: z.boolean().default(false).describe("Include full HTML in response (large)."),
 });
 
@@ -84,19 +84,27 @@ function zodToJson(schema: z.ZodType): object {
       required.push(key);
     }
   }
-  return { type: "object", properties, required };
+  return { type: "object", properties, required, additionalProperties: false };
 }
 
 function zodFieldToJson(field: z.ZodTypeAny): object {
-  let unwrapped = field;
+  let unwrapped: z.ZodTypeAny = field;
+  let defaultValue: unknown = undefined;
   while (unwrapped instanceof z.ZodOptional || unwrapped instanceof z.ZodDefault) {
+    if (unwrapped instanceof z.ZodDefault) {
+      defaultValue = (unwrapped._def as { defaultValue: () => unknown }).defaultValue();
+    }
     unwrapped = unwrapped._def.innerType;
   }
   const description = field.description;
-  if (unwrapped instanceof z.ZodString) return { type: "string", ...(description && { description }) };
-  if (unwrapped instanceof z.ZodNumber) return { type: "number", ...(description && { description }) };
-  if (unwrapped instanceof z.ZodBoolean) return { type: "boolean", ...(description && { description }) };
-  return { type: "string", ...(description && { description }) };
+  const out: Record<string, unknown> = {};
+  if (unwrapped instanceof z.ZodString) out.type = "string";
+  else if (unwrapped instanceof z.ZodNumber) out.type = "number";
+  else if (unwrapped instanceof z.ZodBoolean) out.type = "boolean";
+  else out.type = "string";
+  if (description) out.description = description;
+  if (defaultValue !== undefined) out.default = defaultValue;
+  return out;
 }
 
 // ---------- Server setup ----------
@@ -313,7 +321,7 @@ async function main() {
     }
 
     const app = express();
-    app.use(express.json({ limit: "10mb" }));
+    app.use(express.json({ limit: "2mb" }));
 
     // Bearer-token auth when configured. /health is always public.
     if (authToken) {

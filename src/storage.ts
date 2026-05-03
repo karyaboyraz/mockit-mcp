@@ -76,9 +76,11 @@ export async function saveScreen(input: SaveInput): Promise<SavedScreen> {
 }
 
 export async function getScreen(id: string): Promise<SavedScreen | null> {
+  // listProjects() returns directory names that are already slugged on disk.
+  // Slugging them again is idempotent but misleading — read directly.
   const projects = await listProjects();
   for (const project of projects) {
-    const dir = join(DESIGNS_DIR, slug(project));
+    const dir = join(DESIGNS_DIR, project);
     const files = await readdir(dir).catch(() => []);
     for (const f of files) {
       if (f.endsWith(".json")) {
