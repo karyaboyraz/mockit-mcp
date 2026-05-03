@@ -22,6 +22,9 @@ yarn-error.log*
 coverage/
 .nyc_output/
 
+# Local launch / draft notes
+SOCIAL_DRAFTS.md
+
 # OS / editor cruft
 .DS_Store
 .idea/
