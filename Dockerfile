@@ -19,7 +19,8 @@ ENV NODE_ENV=production \
     HTTP_PORT=7821 \
     HTTP_HOST=0.0.0.0 \
     DESIGNS_DIR=/data/designs \
-    MOCKIT_IN_CONTAINER=1
+    MOCKIT_IN_CONTAINER=1 \
+    CLAUDE_BACKEND=cli
 
 EXPOSE 7821
 VOLUME ["/data"]
